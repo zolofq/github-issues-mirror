@@ -2,6 +2,12 @@
 [Bb]in/
 [Oo]bj/
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+secrets.env
+
 # Logs
 Logs/
 
