@@ -1,8 +1,15 @@
-﻿namespace github_issues_mirror
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace github_issues_mirror
 {
+    using System;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
     public class GithubHttpClient
     {
-        static HttpClient httpClient = new HttpClient();
+        static readonly HttpClient httpClient = new HttpClient();
 
         /// <summary>
         /// Sends an HTTP GET request to the GitHub REST API and retrieves
@@ -15,7 +22,7 @@
         /// Repository name
         /// </param>
         /// <returns></returns>
-        public static async Task<string> GetIssuesAsync(string owner, string repo)
+        public static async Task<JToken> GetIssuesAsync(string owner, string repo)
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/issues";
 
@@ -27,8 +34,8 @@
 
             response.EnsureSuccessStatusCode();
 
-            string content = await response.Content.ReadAsStringAsync();
-            return content;
+            string jsonData = await response.Content.ReadAsStringAsync();
+            return JToken.Parse(jsonData) ?? throw new Exception("Null reference return in jsonData");
         }
     }
 }
