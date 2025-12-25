@@ -1,9 +1,12 @@
+using System;
+using System.Net.Http;
 using github_issues_mirror;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Sprache;
+
 
 var builder = WebApplication.CreateBuilder(args);
-
-DbConfig.Username = builder.Configuration["username"] ?? throw new Exception("Username is required");
-DbConfig.Password = builder.Configuration["password"] ?? throw new Exception("Passowrd is required");
 
 var app = builder.Build();
 
