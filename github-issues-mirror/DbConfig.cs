@@ -1,8 +1,15 @@
 ﻿namespace github_issues_mirror
 {
+    using DotNetEnv;
+
     public static class DbConfig
     {
-        public static string Username { get; set; }
-        public static string Password { get; set; }
+        static DbConfig()
+        {
+            Env.Load();
+        }
+        
+        public static string Username => Env.GetString("DB_USERNAME");
+        public static string Password => Env.GetString("DB_PASSWORD");
     }
 }
