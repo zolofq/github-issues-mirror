@@ -57,12 +57,13 @@ app.MapGet("/github-issues/dotnet/aspnetcore", async () =>
     }
     catch (HttpRequestException ex)
     {
-        return Results.Problem($"Error while request to GitHubApi:{ex.Message}");
+        return Results.Problem($"Error while request to GitHubApi:{ex.ToString()}");
     }
     catch (Exception ex)
     {
-        return Results.Problem($"Error: {ex.Message}");
+        return Results.Problem($"Error:{ex.ToString()}");
     }
+
 });
 
 app.Run();
