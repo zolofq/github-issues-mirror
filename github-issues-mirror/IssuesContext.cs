@@ -7,6 +7,7 @@ namespace github_issues_mirror
     public class IssuesContext : DbContext
     {
         public DbSet<Issues> Issues { get; set; }
+        public DbSet<Comments> Comments { get; set; }
         public IssuesContext()
         {
             Database.EnsureCreated(); 
