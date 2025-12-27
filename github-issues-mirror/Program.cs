@@ -10,12 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-app.MapGet("/github-issues/dotnet/aspnetcore", async () =>
+app.MapGet("/github-issues/zolofq/github-issues-mirror", async () =>
 {
     try
     {
-        
-        var jArray = await GithubHttpClient.GetIssuesAsync("dotnet", "aspnetcore");
+        var jArray = await GithubHttpClient.GetIssuesAsync("zolofq", "github-issues-mirror");
 
         if (jArray == null)
         {
@@ -45,6 +44,8 @@ app.MapGet("/github-issues/dotnet/aspnetcore", async () =>
                 body = issue["body"]?.ToString()
             });
         }
+        
+        await db.SaveChangesAsync();
 
         var issues = db.Issues.ToList();
         foreach (var i in issues)
@@ -52,7 +53,6 @@ app.MapGet("/github-issues/dotnet/aspnetcore", async () =>
             Console.WriteLine($"{i.id} {i.number} {i.title} {i.state} {i.updated_at} {i.author} {i.body}");
         }
         
-        await db.SaveChangesAsync();
         return Results.Ok();
     }
     catch (HttpRequestException ex)
@@ -63,7 +63,31 @@ app.MapGet("/github-issues/dotnet/aspnetcore", async () =>
     {
         return Results.Problem($"Error:{ex.ToString()}");
     }
+});
 
+app.MapPost("/sync-to-github/{id}", async (long id) =>
+{
+    await using var db = new IssuesContext();
+    var issue = db.Issues.FirstOrDefault(x => x.id == id);
+    if (issue == null) return Results.NotFound();
+
+    try
+    {
+        var updateData = new
+        {
+            title = issue.title,
+            body = issue.body,
+            state = issue.state
+        };
+
+        await GithubHttpClient.UpdateIssueAsync("zolofq", "github-issues-mirror", issue.number, updateData);
+
+        return Results.Ok("Github Issue updated successfully");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Failed to sync: {ex.Message}");
+    }
 });
 
 app.Run();
