@@ -39,6 +39,10 @@ namespace github_issues_mirror
             return JToken.Parse(jsonData) ?? throw new Exception("Null reference return in jsonData");
         }
 
+        /// <summary>
+        /// Sends an HTTP PATCH request to the GitHub REST API and updates
+        /// a specific issue in the specified repository.
+        /// </summary>
         public static async Task UpdateIssueAsync(string owner, string repo, int issueNumber, object data)
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}";
@@ -55,6 +59,27 @@ namespace github_issues_mirror
             using HttpResponseMessage response = await httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Sends an HTTP GET request to the GitHub REST API and retrieves
+        /// a list of comments for a specific issue in the specified repository.
+        /// </summary>
+        public static async Task<JToken> GetCommentsAssync(string owner, string repo, int issueNumber)
+        {
+            string url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}/comments";
+            
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+            
+            request.Headers.Add("Authorization", $"Bearer {Config.Token}");
+            request.Headers.Add("User-Agent", "github-issues-mirror");
+            
+            using HttpResponseMessage response = await httpClient.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+            
+            string jsonData = await response.Content.ReadAsStringAsync();
+            return JToken.Parse(jsonData) ?? throw new Exception("Null reference return in jsonData");
         }
     }
 }
