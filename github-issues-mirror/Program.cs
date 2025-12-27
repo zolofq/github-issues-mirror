@@ -23,35 +23,41 @@ app.MapGet("/github-issues/zolofq/github-issues-mirror", async () =>
         
         await using var db = new IssuesContext();
         
+        db.Database.EnsureDeleted();
+        db.Database.EnsureCreated();
+        
         foreach (var issue in jArray)
         {
             if (issue == null) throw new Exception("issue null reference");
 
-            var id = (long)issue["id"]!;
+            var issueId = (long)issue["id"]!;
 
-            // duplicate protection
-            if (db.Issues.Any(x => x.id == id))
-                continue;
+            var dbIssue = db.Issues.FirstOrDefault(x => x.id == issueId);
 
-            db.Issues.Add(new Issues
+            if (dbIssue == null)
             {
-                id = id,
-                number = (int)issue["number"]!,
-                title = issue["title"]!.ToString(),
-                state = issue["state"]!.ToString(),
-                updated_at = DateTimeOffset.Parse(issue["updated_at"]!.ToString()).UtcDateTime,
-                author = issue["user"]?["login"]?.ToString(),
-                body = issue["body"]?.ToString()
-            });
+                dbIssue = new Issues
+                {
+                    id = issueId,
+                    number = (int)issue["number"]!,
+                    title = issue["title"]!.ToString(),
+                    state = issue["state"]!.ToString(),
+                    updated_at = DateTimeOffset.Parse(issue["updated_at"]!.ToString()).UtcDateTime,
+                    author = issue["user"]?["login"]?.ToString(),
+                    body = issue["body"]?.ToString()
+                };
+                db.Issues.Add(dbIssue);
+            }
+            else
+            {
+                dbIssue.title = issue["title"]!.ToString();
+                dbIssue.state = issue["state"]!.ToString();
+                dbIssue.updated_at = DateTimeOffset.Parse(issue["updated_at"]!.ToString()).UtcDateTime;
+                dbIssue.body = issue["body"]?.ToString();
+            }
         }
         
         await db.SaveChangesAsync();
-
-        var issues = db.Issues.ToList();
-        foreach (var i in issues)
-        {
-            Console.WriteLine($"{i.id} {i.number} {i.title} {i.state} {i.updated_at} {i.author} {i.body}");
-        }
         
         return Results.Ok();
     }
