@@ -2,14 +2,15 @@
 {
     using DotNetEnv;
 
-    public static class DbConfig
+    public static class Config
     {
-        static DbConfig()
+        static Config()
         {
             Env.Load();
         }
         
         public static string Username => Env.GetString("DB_USERNAME");
         public static string Password => Env.GetString("DB_PASSWORD");
+        public static string Token => Env.GetString("GITHUB_TOKEN");
     }
 }

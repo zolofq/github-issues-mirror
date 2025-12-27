@@ -14,7 +14,7 @@ namespace github_issues_mirror
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql($"Host=localhost;Port=5432;Database=githubIssues;Username={DbConfig.Username};Password={DbConfig.Password}");
+            optionsBuilder.UseNpgsql($"Host=localhost;Port=5432;Database=githubIssues;Username={Config.Username};Password={Config.Password}");
         }
     }
 }
