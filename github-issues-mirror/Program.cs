@@ -55,6 +55,36 @@ app.MapGet("/github-issues/zolofq/github-issues-mirror", async () =>
                 dbIssue.updated_at = DateTimeOffset.Parse(issue["updated_at"]!.ToString()).UtcDateTime;
                 dbIssue.body = issue["body"]?.ToString();
             }
+
+            var commentsData = await GithubHttpClient.GetCommentsAssync("zolofq", "github-issues-mirror", dbIssue.number);
+
+            foreach (var commentToken in commentsData)
+            {
+                var commentId = (long)commentToken["id"];
+
+                var dbComment = db.Comments.FirstOrDefault(c => c.id == commentId);
+
+                if (dbComment == null)
+                {
+                    dbComment = new Comments
+                    {
+                        id = commentId,
+                        issue_id = issueId,
+                        author = commentToken["user"]?["login"]?.ToString() ?? "unknown",
+                        body = commentToken["body"]?.ToString() ?? "",
+                        updated_at = DateTimeOffset.Parse(commentToken["updated_at"]!.ToString()).UtcDateTime
+                    };
+                    dbIssue.Comments.Add(dbComment);
+                }
+                else
+                {
+                    dbComment.id = commentId;
+                    dbComment.issue_id = issueId;
+                    dbComment.author = commentToken["user"]?["login"]?.ToString() ?? "unknown";
+                    dbComment.body = commentToken["body"]?.ToString() ?? "";
+                    dbComment.updated_at = DateTimeOffset.Parse(commentToken["updated_at"]!.ToString()).UtcDateTime;
+                }
+            }
         }
         
         await db.SaveChangesAsync();
