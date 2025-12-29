@@ -8,13 +8,17 @@ using Sprache;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure dependency injection for http client and github http client
+builder.Services.AddHttpClient(); 
+builder.Services.AddScoped<GithubHttpClient>();
+
 var app = builder.Build();
 
-app.MapGet("/github-issues/zolofq/github-issues-mirror", async () =>
+app.MapGet("/github-issues/zolofq/github-issues-mirror", async (GithubHttpClient githubHttpClient) =>
 {
     try
     {
-        var jArray = await GithubHttpClient.GetIssuesAsync("zolofq", "github-issues-mirror");
+        var jArray = await githubHttpClient.GetIssuesAsync("zolofq", "github-issues-mirror");
 
         if (jArray == null)
         {
@@ -56,7 +60,7 @@ app.MapGet("/github-issues/zolofq/github-issues-mirror", async () =>
                 dbIssue.body = issue["body"]?.ToString();
             }
 
-            var commentsData = await GithubHttpClient.GetCommentsAssync("zolofq", "github-issues-mirror", dbIssue.number);
+            var commentsData = await githubHttpClient.GetCommentsAssync("zolofq", "github-issues-mirror", dbIssue.number);
 
             foreach (var commentToken in commentsData)
             {
@@ -101,7 +105,7 @@ app.MapGet("/github-issues/zolofq/github-issues-mirror", async () =>
     }
 });
 
-app.MapPost("/sync-to-github/{id}", async (long id) =>
+app.MapPost("/sync-to-github/{id}", async (long id, GithubHttpClient githubHttpClient) =>
 {
     await using var db = new IssuesContext();
     var issue = db.Issues.FirstOrDefault(x => x.id == id);
@@ -116,7 +120,7 @@ app.MapPost("/sync-to-github/{id}", async (long id) =>
             state = issue.state
         };
 
-        await GithubHttpClient.UpdateIssueAsync("zolofq", "github-issues-mirror", issue.number, updateData);
+        await githubHttpClient.UpdateIssueAsync("zolofq", "github-issues-mirror", issue.number, updateData);
 
         return Results.Ok("Github Issue updated successfully");
     }

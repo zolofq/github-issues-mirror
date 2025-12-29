@@ -9,7 +9,13 @@ namespace github_issues_mirror
 
     public class GithubHttpClient
     {
-        static readonly HttpClient httpClient = new HttpClient();
+        private readonly HttpClient _httpClient;
+
+        // Constructs a new instance of the GithubHttpClient class.
+        public GithubHttpClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
         
         /// <summary>
         /// Sends an HTTP GET request to the GitHub REST API and retrieves
@@ -22,7 +28,7 @@ namespace github_issues_mirror
         /// Repository name
         /// </param>
         /// <returns></returns>
-        public static async Task<JToken> GetIssuesAsync(string owner, string repo)
+        public async Task<JToken> GetIssuesAsync(string owner, string repo)
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/issues";
 
@@ -31,7 +37,7 @@ namespace github_issues_mirror
             request.Headers.Add("Authorization", $"Bearer {Config.Token}");
             request.Headers.Add("User-Agent", "github-issues-mirror");
 
-            using HttpResponseMessage response = await httpClient.SendAsync(request);
+            using HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
 
@@ -43,7 +49,7 @@ namespace github_issues_mirror
         /// Sends an HTTP PATCH request to the GitHub REST API and updates
         /// a specific issue in the specified repository.
         /// </summary>
-        public static async Task UpdateIssueAsync(string owner, string repo, int issueNumber, object data)
+        public async Task UpdateIssueAsync(string owner, string repo, int issueNumber, object data)
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}";
 
@@ -56,7 +62,7 @@ namespace github_issues_mirror
             request.Headers.Add("Authorization", $"Bearer {Config.Token}");
             request.Headers.Add("User-Agent", "github-issues-mirror");
 
-            using HttpResponseMessage response = await httpClient.SendAsync(request);
+            using HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
         }
@@ -65,7 +71,7 @@ namespace github_issues_mirror
         /// Sends an HTTP GET request to the GitHub REST API and retrieves
         /// a list of comments for a specific issue in the specified repository.
         /// </summary>
-        public static async Task<JToken> GetCommentsAssync(string owner, string repo, int issueNumber)
+        public async Task<JToken> GetCommentsAssync(string owner, string repo, int issueNumber)
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/issues/{issueNumber}/comments";
             
@@ -74,7 +80,7 @@ namespace github_issues_mirror
             request.Headers.Add("Authorization", $"Bearer {Config.Token}");
             request.Headers.Add("User-Agent", "github-issues-mirror");
             
-            using HttpResponseMessage response = await httpClient.SendAsync(request);
+            using HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
             

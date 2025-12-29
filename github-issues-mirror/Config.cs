@@ -11,6 +11,8 @@
         
         public static string Username => Env.GetString("DB_USERNAME");
         public static string Password => Env.GetString("DB_PASSWORD");
-        public static string Token => Env.GetString("GITHUB_TOKEN");
+        
+        public static string Token { get; set; } = Env.GetString("GITHUB_TOKEN");
+        
     }
 }
