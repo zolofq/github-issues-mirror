@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\github-issues-mirror\github-issues-mirror.csproj" />
+      <ProjectReference Include="..\src\src.csproj" />
     </ItemGroup>
 
 </Project>

@@ -177,7 +177,7 @@ public class GithubHttpClientTests
                 req.Method == HttpMethod.Get && 
                 req.RequestUri.ToString().Contains("/issues/42/comments") &&
                 req.Headers.Authorization.Parameter == "test_token_123" &&
-                req.Headers.UserAgent.ToString() == "github-issues-mirror"
+                req.Headers.UserAgent.ToString() == "src"
             ),
             ItExpr.IsAny<CancellationToken>()
         );
