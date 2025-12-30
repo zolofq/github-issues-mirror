@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="github-issues-mirror.Tests/github-issues-mirror.Tests.csproj" />
-  <Project Path="github-issues-mirror/github-issues-mirror.csproj" />
+  <Project Path="github-issues-mirror.Tests\github-issues-mirror.Tests.csproj" />
+  <Project Path="github-issues-mirror\github-issues-mirror.csproj" />
 </Solution>

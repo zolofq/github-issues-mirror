@@ -29,7 +29,7 @@ public class GithubHttpClientTests
             });
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var service = new GithubHttpClient(httpClient);
+        var service = new GitHubIssueService(httpClient);
         var result = await service.GetIssuesAsync("owner", "repo");
 
         Assert.NotNull(result);
@@ -63,7 +63,7 @@ public class GithubHttpClientTests
             });
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var service = new GithubHttpClient(httpClient);
+        var service = new GitHubIssueService(httpClient);
 
         // Assert that an exception is thrown when the response is not successful
         await Assert.ThrowsAsync<HttpRequestException>(() => 
@@ -99,7 +99,7 @@ public class GithubHttpClientTests
             });
         
         var httpClient = new HttpClient(handlerMock.Object);
-        var service = new GithubHttpClient(httpClient);
+        var service = new GitHubIssueService(httpClient);
 
         var updateData = new { title = "New Title", state = "closed" };
         
@@ -129,7 +129,7 @@ public class GithubHttpClientTests
             });
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var service = new GithubHttpClient(httpClient);
+        var service = new GitHubIssueService(httpClient);
         
         var updateData = new { title = "New Title", state = "closed" };
 
@@ -139,7 +139,7 @@ public class GithubHttpClientTests
     }
     
     [Fact]
-    public async Task GetCommentsAssync_ReturnsJson_And_SendsCorrectHeaders()
+    public async Task GetCommentsAsync_ReturnsJson_And_SendsCorrectHeaders()
     {
         // --- Arrange ---
         var handlerMock = new Mock<HttpMessageHandler>();
@@ -162,9 +162,9 @@ public class GithubHttpClientTests
             });
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var service = new github_issues_mirror.GithubHttpClient(httpClient);
+        var service = new github_issues_mirror.GitHubIssueService(httpClient);
 
-        var result = await service.GetCommentsAssync("zolofq", "my-repo", 42);
+        var result = await service.GetCommentsAsync("zolofq", "my-repo", 42);
 
         Assert.NotNull(result);
         Assert.Equal(2, ((JArray)result).Count);
@@ -184,7 +184,7 @@ public class GithubHttpClientTests
     }
 
     [Fact]
-    public async Task GetCommentsAssync_ThrowsException_OnServerError()
+    public async Task GetCommentsAsync_ThrowsException_OnServerError()
     {
         var handlerMock = new Mock<HttpMessageHandler>();
         handlerMock
@@ -193,9 +193,9 @@ public class GithubHttpClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
 
         var httpClient = new HttpClient(handlerMock.Object);
-        var service = new github_issues_mirror.GithubHttpClient(httpClient);
+        var service = new github_issues_mirror.GitHubIssueService(httpClient);
 
         await Assert.ThrowsAsync<HttpRequestException>(() => 
-            service.GetCommentsAssync("owner", "repo", 1));
+            service.GetCommentsAsync("owner", "repo", 1));
     }
 }
