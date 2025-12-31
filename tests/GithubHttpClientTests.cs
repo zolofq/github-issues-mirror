@@ -47,6 +47,7 @@ public class GithubHttpClientTests
 
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.GetIssuesAsync("o", "r"));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.GetCommentsAsync("o", "r", 1));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _service.CreateIssueAsync("o", "r", new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateIssueAsync("o", "r", 1, new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateCommentAsync("o", "r", 1, new { }));
     }
@@ -95,14 +96,27 @@ public class GithubHttpClientTests
     }
 
     [Fact]
+    public async Task CreateIssueAsync_SendsCorrectPostRequest()
     {
+        string capturedJson = null;
+        var issueData = new { title = "Bug report", body = "Something is broken" };
+
+        _handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>())
+            .Callback<HttpRequestMessage, CancellationToken>((req, token) =>
             {
+                if (req.Content != null)
+                {
+                    capturedJson = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                }
+            })
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
+        await _service.CreateIssueAsync("owner", "repo", issueData);
 
         Assert.Equal("{\"title\":\"Bug report\",\"body\":\"Something is broken\"}", capturedJson);
 
