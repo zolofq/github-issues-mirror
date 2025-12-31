@@ -1,5 +1,6 @@
 namespace github_issues_mirror;
 
+using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,9 +20,9 @@ public abstract class GitHubClientBase
     {
         var url = $"https://api.github.com/{endpoint.TrimStart('/')}";
         using var request = new HttpRequestMessage(method, url);
-        
+
         request.Headers.Add("Authorization", $"Bearer {Config.Token}");
-        request.Headers.Add("User-Agent", "github-issues-mirror");
+        request.Headers.Add("User-Agent", "github-issues-mirror"); 
 
         if (data != null)
         {

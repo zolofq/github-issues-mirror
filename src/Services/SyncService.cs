@@ -62,4 +62,20 @@ public class SyncService(GitHubIssueService github, IssuesContext db)
             updated_at = comment.updated_at
         });
     }
+    
+    public async Task CreateIssueFromLocalAsync(long number, string owner, string repo)
+    {
+        var issue = await db.Issues.FirstOrDefaultAsync(i => i.number == number);
+    
+        if (issue == null)
+        {
+            throw new KeyNotFoundException($"Issue with ID {number} not found in local database.");
+        }
+    
+        await github.CreateIssueAsync(owner, repo, new
+        {
+            title = issue.title,
+            body = issue.body
+        });
+    }
 }

@@ -21,7 +21,7 @@
             ?? throw new Exception("Empty response");
 
         public async Task UpdateCommentAsync(string owner, string repo, long id, object data) =>
-            await SendRequestAsync(HttpMethod.Patch, $"repos/{owner}/{repo}/issues//comments/{id}",
+            await SendRequestAsync(HttpMethod.Patch, $"repos/{owner}/{repo}/issues/comments/{id}",
                 data);
         
     }

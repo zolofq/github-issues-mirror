@@ -10,20 +10,26 @@ public static class GitHubEndpoints
 
         group.MapGet("/mirror", async (SyncService syncService) =>
         {
-            await syncService.MirrorGithubToLocalAsync("zolofq", "src");
+            await syncService.MirrorGithubToLocalAsync("zolofq", "github-issues-mirror");
             return Results.Ok();
         });
         
         group.MapPost("/sync/{id}", async (long id, SyncService syncService) =>
         {
-            await syncService.SyncLocalToGitHubAsync(id, "zolofq", "src");
+            await syncService.SyncLocalToGitHubAsync(id, "zolofq", "github-issues-mirror");
             return Results.Ok();
         });
 
         group.MapPost("/sync/comment/{id}", async (long id, SyncService syncService) =>
         {
-            await syncService.SyncLocalCommentToGitHubAsync(id, "zolofq", "src");
+            await syncService.SyncLocalCommentToGitHubAsync(id, "zolofq", "github-issues-mirror");
             return Results.Ok();
         });
+
+        group.MapPost("/create/{number}", async (long number, SyncService syncService) =>
+        {
+            await syncService.CreateIssueFromLocalAsync(number, "zolofq", "github-issues-mirror");
+            return Results.Ok();
+        }); 
     }
 }
