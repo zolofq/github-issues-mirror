@@ -50,4 +50,16 @@ public class SyncService(GitHubIssueService github, IssuesContext db)
             state = issue.state
         });
     }
+
+    public async Task SyncLocalCommentToGitHubAsync(long id, string owner, string repo)
+    {
+        var comment = await db.Comments.FindAsync(id);
+        if (comment == null) return;
+
+        await github.UpdateCommentAsync(owner, repo, comment.id, new
+        {
+            body = comment.body,
+            updated_at = comment.updated_at
+        });
+    }
 }

@@ -19,5 +19,11 @@ public static class GitHubEndpoints
             await syncService.SyncLocalToGitHubAsync(id, "zolofq", "src");
             return Results.Ok();
         });
+
+        group.MapPost("/sync/comment/{id}", async (long id, SyncService syncService) =>
+        {
+            await syncService.SyncLocalCommentToGitHubAsync(id, "zolofq", "src");
+            return Results.Ok();
+        });
     }
 }

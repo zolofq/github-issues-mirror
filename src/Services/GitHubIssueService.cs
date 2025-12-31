@@ -13,12 +13,16 @@
         public async Task UpdateIssueAsync(string owner, string repo, int issueNumber, object data) =>
             await SendRequestAsync(HttpMethod.Patch, $"repos/{owner}/{repo}/issues/{issueNumber}", data);
 
+        public async Task CreateIssueAsync(string owner, string repo, object data) =>
+            await SendRequestAsync(HttpMethod.Post, $"repos/{owner}/{repo}/issues", data);
+        
         public async Task<JToken> GetCommentsAsync(string owner, string repo, int issueNumber) =>
             await SendRequestAsync(HttpMethod.Get, $"repos/{owner}/{repo}/issues/{issueNumber}/comments")
             ?? throw new Exception("Empty response");
 
-        public async Task UpdateCommentAsync(string owner, string repo, int issueId, int commentId, object data) =>
-            await SendRequestAsync(HttpMethod.Patch, $"repos/{owner}/{repo}/issues/{issueId}/comments/{commentId}",
+        public async Task UpdateCommentAsync(string owner, string repo, long id, object data) =>
+            await SendRequestAsync(HttpMethod.Patch, $"repos/{owner}/{repo}/issues//comments/{id}",
                 data);
+        
     }
 }
