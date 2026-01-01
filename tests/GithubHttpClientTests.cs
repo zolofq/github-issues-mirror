@@ -51,6 +51,7 @@ public class GithubHttpClientTests
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateIssueAsync("o", "r", 1, new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateCommentAsync("o", "r", 1, new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.CreateCommentAsync("o", "r", 2, new { }));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _service.DeleteCommentAsync("o", "r", 1));
     }
 
     [Fact]
@@ -207,5 +208,20 @@ public class GithubHttpClientTests
                 ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_SendsCorrectDeleteRequest()
+    {
+        SetupResponse(HttpStatusCode.OK);
+
+        await _service.DeleteCommentAsync("owner", "repo", 4);
+        
+        _handlerMock.Protected().Verify(
+            "SendAsync",
+            Times.Once(),
+            ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Delete),
+            ItExpr.IsAny<CancellationToken>()
+        );
     }
 }
