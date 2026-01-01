@@ -20,9 +20,16 @@ public abstract class GitHubClientBase
     {
         var url = $"https://api.github.com/{endpoint.TrimStart('/')}";
         using var request = new HttpRequestMessage(method, url);
+        
+        if (!string.IsNullOrEmpty(Config.Token))
+        {
+            request.Headers.Add("Authorization", $"Bearer {Config.Token}");
+        }
 
-        request.Headers.Add("Authorization", $"Bearer {Config.Token}");
-        request.Headers.Add("User-Agent", "github-issues-mirror"); 
+        if (!string.IsNullOrEmpty(Config.GH_Repository))
+        {
+            request.Headers.Add("User-Agent", Config.GH_Repository);
+        }
 
         if (data != null)
         {
@@ -31,6 +38,7 @@ public abstract class GitHubClientBase
         }
 
         using var response = await _httpClient.SendAsync(request);
+        
         response.EnsureSuccessStatusCode();
 
         if (method == HttpMethod.Get)
