@@ -27,5 +27,8 @@
         public async Task CreateCommentAsync(string owner, string repo, long id, object data) =>
             await SendRequestAsync(HttpMethod.Post, $"repos/{owner}/{repo}/issues/{id}/comments",
                 data);
+        
+        public async Task DeleteCommentAsync(string owner, string repo, long id) =>
+            await SendRequestAsync(HttpMethod.Delete, $"repos/{owner}/{repo}/issues/comments/{id}");
     }
 }

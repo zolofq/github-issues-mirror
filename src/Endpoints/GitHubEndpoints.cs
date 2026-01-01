@@ -37,5 +37,11 @@ public static class GitHubEndpoints
             await syncService.CreateCommentFromLocalAsync(issueNumber, commentId, Config.GH_Username, Config.GH_Repository);
             return Results.Ok(new { status = "Success", issueId = issueNumber, localCommentId = commentId });
         });
+
+        group.MapDelete("/delete/comments/{id}", async (long id, SyncService SyncService) =>
+        {
+            await SyncService.DeleteCommentFromLocalAsync(id, Config.GH_Username, Config.GH_Repository);
+            return Results.Ok();
+        });
     }
 }

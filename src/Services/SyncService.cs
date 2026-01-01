@@ -116,4 +116,14 @@ public class SyncService(GitHubIssueService github, IssuesContext db)
             updated_at = comment.updated_at
         });
     }
+
+    public async Task DeleteCommentFromLocalAsync(long id, string owner, string repo)
+    {
+        var comment = await db.Comments.FindAsync(id);
+        if (comment == null) return;
+        
+        await github.DeleteCommentAsync(owner, repo, id);
+        db.Comments.Remove(comment);
+        await db.SaveChangesAsync();
+    }
 }
