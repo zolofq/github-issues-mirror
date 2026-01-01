@@ -24,5 +24,8 @@
             await SendRequestAsync(HttpMethod.Patch, $"repos/{owner}/{repo}/issues/comments/{id}",
                 data);
         
+        public async Task CreateCommentAsync(string owner, string repo, long id, object data) =>
+            await SendRequestAsync(HttpMethod.Post, $"repos/{owner}/{repo}/issues/{id}/comments",
+                data);
     }
 }

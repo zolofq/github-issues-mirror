@@ -31,5 +31,11 @@ public static class GitHubEndpoints
             await syncService.CreateIssueFromLocalAsync(number, Config.GH_Username, Config.GH_Repository);
             return Results.Ok();
         });
+
+        group.MapPost("/create/{issueNumber}/comments/{commentId}", async (long issueNumber, long commentId, SyncService syncService) =>
+        {
+            await syncService.CreateCommentFromLocalAsync(issueNumber, commentId, Config.GH_Username, Config.GH_Repository);
+            return Results.Ok(new { status = "Success", issueId = issueNumber, localCommentId = commentId });
+        });
     }
 }

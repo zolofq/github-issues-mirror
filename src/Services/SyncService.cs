@@ -104,4 +104,16 @@ public class SyncService(GitHubIssueService github, IssuesContext db)
             body = issue.body
         });
     }
+
+    public async Task CreateCommentFromLocalAsync(long commentId, long id, string owner, string repo)
+    {
+        var comment = await db.Comments.FirstOrDefaultAsync(c => c.id == commentId);
+        if (comment == null) return;
+        
+        await github.CreateCommentAsync(owner, repo, id, new
+        {
+            body = comment.body,
+            updated_at = comment.updated_at
+        });
+    }
 }
