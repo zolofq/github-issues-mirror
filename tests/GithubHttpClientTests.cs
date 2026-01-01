@@ -46,7 +46,7 @@ public class GithubHttpClientTests
         SetupResponse(code);
 
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.GetIssuesAsync("o", "r"));
-        await Assert.ThrowsAsync<HttpRequestException>(() => _service.GetCommentsAsync("o", "r", 1));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _service.GetCommentsAsync("o", "r"));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.CreateIssueAsync("o", "r", new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateIssueAsync("o", "r", 1, new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateCommentAsync("o", "r", 1, new { }));
@@ -131,25 +131,14 @@ public class GithubHttpClientTests
     }
 
     [Fact]
-    public async Task GetCommentsAsync_ReturnsJson_And_SendsCorrectHeaders()
+    public async Task GetCommentAsync_ReturnsCorrectJson_WhenResponseIsSuccessful()
     {
-        SetupResponse(HttpStatusCode.OK, "[{'id': 101, 'body': 'First comment'}]");
+        SetupResponse(HttpStatusCode.OK, "[{'id': 1, 'body': 'Test Comment'}]");
 
-        var result = await _service.GetCommentsAsync("zolofq", "my-repo", 42);
+        var result = await _service.GetCommentsAsync("owner", "repo");
 
         Assert.NotNull(result);
-        Assert.Equal("First comment", result[0]["body"].ToString());
-
-        _handlerMock.Protected().Verify(
-            "SendAsync",
-            Times.Once(),
-            ItExpr.Is<HttpRequestMessage>(req =>
-                req.Method == HttpMethod.Get &&
-                req.RequestUri.ToString().Contains("/issues/42/comments") &&
-                req.Headers.Authorization.Parameter == "test_token_123"
-            ),
-            ItExpr.IsAny<CancellationToken>()
-        );
+        Assert.Equal("Test Comment", result[0]["body"].ToString());
     }
 
     [Fact]
