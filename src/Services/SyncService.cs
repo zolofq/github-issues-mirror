@@ -11,7 +11,7 @@ public class SyncService(GitHubIssueService github, IssuesContext db)
         foreach (var token in issuesJson)
         {
             var issueId = (long)token["id"]!;
-            var existing = await db.Issues.Include(i => i.Comments)
+            var existing = await db.Issues
                 .FirstOrDefaultAsync(i => i.id == issueId);
 
             if (existing == null)
@@ -34,6 +34,32 @@ public class SyncService(GitHubIssueService github, IssuesContext db)
                 existing.state = token["state"]!.ToString();
                 existing.updated_at = DateTimeOffset.Parse(token["updated_at"]!.ToString()).UtcDateTime;
                 existing.body = token["body"]?.ToString();
+            }
+
+            var commentsJson = await github.GetCommentsAsync(owner, repo);
+
+            foreach (var cToken in commentsJson)
+            {
+                var commentId = (long)cToken["id"]!;
+                var existingComment = await db.Comments
+                    .FirstOrDefaultAsync(c => c.id == commentId);
+
+                if (existingComment == null)
+                {
+                    existingComment = new Comments
+                    {
+                        id = commentId,
+                        body = cToken["body"]?.ToString(),
+                        author = cToken["user"]?["login"]?.ToString(),
+                        updated_at = DateTimeOffset.Parse(cToken["updated_at"]!.ToString()).UtcDateTime
+                    };
+                    db.Comments.Add(existingComment);
+                }
+                else
+                {
+                    existingComment.body = cToken["body"]?.ToString();
+                    existingComment.updated_at = DateTimeOffset.Parse(cToken["updated_at"]!.ToString()).UtcDateTime;
+                }
             }
         }
         await db.SaveChangesAsync();
