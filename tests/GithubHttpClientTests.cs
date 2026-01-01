@@ -50,6 +50,7 @@ public class GithubHttpClientTests
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.CreateIssueAsync("o", "r", new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateIssueAsync("o", "r", 1, new { }));
         await Assert.ThrowsAsync<HttpRequestException>(() => _service.UpdateCommentAsync("o", "r", 1, new { }));
+        await Assert.ThrowsAsync<HttpRequestException>(() => _service.CreateCommentAsync("o", "r", 2, new { }));
     }
 
     [Fact]
@@ -129,7 +130,7 @@ public class GithubHttpClientTests
                 ItExpr.IsAny<CancellationToken>()
             );
     }
-
+    
     [Fact]
     public async Task GetCommentAsync_ReturnsCorrectJson_WhenResponseIsSuccessful()
     {
@@ -171,5 +172,40 @@ public class GithubHttpClientTests
             ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Patch),
             ItExpr.IsAny<CancellationToken>()
         );
+    }
+    
+    [Fact]
+    public async Task CreateCommentAsync_SendsCorrectPostRequest()
+    {
+        string capturedJson = null;
+        var issueData = new { body = "Something is broken" };
+
+        _handlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .Callback<HttpRequestMessage, CancellationToken>((req, token) =>
+            {
+                if (req.Content != null)
+                {
+                    capturedJson = req.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                }
+            })
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+        await _service.CreateCommentAsync("owner", "repo", 2, issueData);
+
+        Assert.Equal("{\"body\":\"Something is broken\"}", capturedJson);
+
+        _handlerMock
+            .Protected()
+            .Verify(
+                "SendAsync",
+                Times.Once(),
+                ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
     }
 }
