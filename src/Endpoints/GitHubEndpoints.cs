@@ -1,12 +1,25 @@
 namespace github_issues_mirror.Endpoints;
 
 using github_issues_mirror.Services;
+using Newtonsoft.Json.Linq;
 
 public static class GitHubEndpoints
 {
     public static void MapGitHubEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/github");
+
+        group.MapPost("/webhook", async (HttpRequest request, SyncService syncService, IssuesContext db) =>
+        {
+            var eventType = request.Headers["X-Github-Event"].ToString();
+
+            if (eventType == "issues" || eventType == "issue_comment")
+            {
+                await syncService.MirrorGithubToLocalAsync(Config.GH_Username, Config.GH_Repository);
+            }
+
+            return Results.Ok();
+        });
 
         group.MapGet("/mirror", async (SyncService syncService) =>
         {

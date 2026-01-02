@@ -21,7 +21,7 @@
         public DateTime updated_at { get; set; }
         
         // Foreign key to communicate with Issues
-        public long issue_id { get; set; }
+        public long Issueid { get; set; }
         public Issues Issue { get; set; } = null!;
     }
 }
