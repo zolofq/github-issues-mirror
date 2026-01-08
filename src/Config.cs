@@ -6,7 +6,7 @@
     {
         static Config()
         {
-            Env.Load();
+            DotNetEnv.Env.TraversePath().Load();
         }
         
         private static string? _token;
